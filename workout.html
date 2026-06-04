@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TRAINLOG">
+<title>TRAINLOG</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0e14;--bg2:#16161f;--bg3:#1e1e2a;--bg4:#26263a;
+  --border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.16);
+  --text:#f2f2fa;--muted:#8a8aa8;--muted2:#b0b0cc;
+  --accent:#00e5a0;--accent2:#00b87a;
+  --accent-dim:rgba(0,229,160,0.1);--accent-dim2:rgba(0,229,160,0.06);
+  --orange:#ff8c42;--orange-dim:rgba(255,140,66,0.12);
+  --red:#ff4d6d;--red-dim:rgba(255,77,109,0.12);
+  --blue:#4d9fff;--purple:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;}
+.header{background:linear-gradient(180deg,rgba(0,229,160,0.07) 0%,transparent 100%);border-bottom:1px solid var(--border);padding:52px 20px 14px;flex-shrink:0;position:relative;z-index:10;}
+.header-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:11px;color:var(--accent);letter-spacing:4px;margin-bottom:2px;}
+.header-top{display:flex;align-items:flex-end;justify-content:space-between;}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1;}
+.header-streak{display:inline-flex;align-items:center;gap:5px;background:var(--orange-dim);border:1px solid rgba(255,140,66,0.2);color:var(--orange);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;position:relative;z-index:1;}
+.bottom-nav{flex-shrink:0;background:rgba(14,14,20,0.97);border-top:1px solid var(--border);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom));position:relative;z-index:10;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;background:none;border:none;cursor:pointer;font-family:inherit;}
+.nav-icon{font-size:16px;opacity:0.35;}
+.nav-label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+.nav-btn.active .nav-icon{opacity:1;}
+.nav-btn.active .nav-label{color:var(--accent);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;}
+.section-label{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;}
+.part-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.part-btn{padding:14px 6px 12px;border-radius:12px;border:1.5px solid var(--border2);background:var(--bg3);cursor:pointer;text-align:center;font-family:inherit;}
+.part-en{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;line-height:1;display:block;}
+.part-ja{font-size:10px;font-weight:700;margin-top:3px;display:block;letter-spacing:1px;}
+.part-line{width:20px;height:2px;border-radius:1px;margin:5px auto 0;}
+.ex-item{padding:13px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);margin-bottom:7px;cursor:pointer;}
+.ex-item-top{display:flex;align-items:flex-start;justify-content:space-between;}
+.ex-name{font-size:14px;font-weight:600;color:var(--text);}
+.ex-desc{font-size:11px;color:var(--muted2);margin-top:4px;line-height:1.5;}
+.ex-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--orange);background:var(--orange-dim);padding:2px 6px;border-radius:4px;margin-top:5px;}
+.ex-arrow{font-family:'Bebas Neue',sans-serif;font-size:14px;margin-left:10px;flex-shrink:0;margin-top:2px;}
+.ex-info-row{display:flex;gap:8px;margin-top:8px;}
+.ex-info-btn{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border2);background:var(--bg4);color:var(--muted2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;text-align:center;}
+.ex-start-btn{flex:2;padding:7px;border-radius:8px;border:none;background:var(--accent);color:#000;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:1px;text-align:center;}
+.plan-row{display:flex;gap:6px;margin-bottom:12px;}
+.plan-btn{flex:1;padding:12px 4px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg3);cursor:pointer;text-align:center;font-family:inherit;}
+.plan-btn.active{border-color:var(--accent);background:var(--accent-dim);}
+.plan-level{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--muted2);}
+.plan-btn.active .plan-level{color:var(--accent);}
+.plan-detail{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;}
+.set-record-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
+.set-record-card.active-set{border-color:var(--accent);background:rgba(0,229,160,0.04);}
+.set-num{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.rep-input{width:100%;padding:14px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg4);font-size:28px;font-weight:700;text-align:center;font-family:'DM Mono',monospace;color:var(--text);-webkit-user-select:text;user-select:text;margin:10px 0 6px;}
+.rep-label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;text-align:center;display:block;margin-bottom:12px;}
+.done-btn-big{width:100%;padding:16px;border-radius:12px;border:none;background:var(--accent);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:1px;margin-bottom:8px;}
+.giveup-btn-big{width:100%;padding:13px;border-radius:12px;border:1.5px solid rgba(255,77,109,0.3);background:var(--red-dim);color:var(--red);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;}
+.cancel-ex-btn{width:100%;padding:10px;border:none;background:none;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:inherit;margin-top:4px;text-transform:uppercase;}
+.howto-btn{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--muted2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;margin-bottom:8px;}
+.set-done-num{font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:var(--accent);}
+.set-giveup-label{font-size:11px;color:var(--red);font-weight:700;}
+.prog-wrap{height:3px;background:var(--bg4);border-radius:2px;margin-top:8px;}
+.prog-bar{height:3px;background:var(--accent);border-radius:2px;}
+.action-btn{width:100%;padding:16px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;}
+.action-btn.primary{background:var(--accent);color:#000;}
+.action-btn.secondary{background:var(--bg3);color:var(--muted2);border:1px solid var(--border);}
+.tip-card{background:var(--bg2);border:1px solid rgba(167,139,250,0.2);border-left:3px solid var(--purple);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--muted2);line-height:1.7;}
+.comment-card{background:var(--accent-dim2);border:1px solid rgba(0,229,160,0.15);border-radius:12px;padding:14px;margin-bottom:12px;}
+.comment-text{font-size:15px;font-weight:600;color:var(--accent);line-height:1.5;}
+.cal-nav-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-nav-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);font-size:16px;cursor:pointer;color:var(--text);}
+.cal-month{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{text-align:center;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1px;padding:4px 0;}
+.cal-cell{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:600;background:var(--bg3);border:1px solid transparent;cursor:pointer;font-family:inherit;color:var(--muted2);}
+.cal-cell.empty{background:none;cursor:default;}
+.cal-cell.today{border-color:var(--accent);color:var(--accent);}
+.cal-cell.has-workout{background:var(--accent-dim);color:var(--text);}
+.cal-cell.has-workout.today{border-color:var(--accent);background:var(--accent);color:#000;font-weight:800;}
+.cal-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);margin-top:2px;}
+.cal-cell.has-workout.today .cal-dot{background:#000;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1;}
+.stat-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+.part-stat-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.part-stat-en{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;width:68px;}
+.part-stat-count{font-size:11px;color:var(--muted);font-weight:600;}
+.part-bar-wrap{width:80px;height:3px;background:var(--bg4);border-radius:2px;}
+.part-bar{height:3px;border-radius:2px;}
+.badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.badge-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;}
+.badge-item.earned{background:rgba(255,140,66,0.08);border-color:rgba(255,140,66,0.25);}
+.badge-emoji{font-size:24px;margin-bottom:4px;}
+.badge-name{font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;}
+.badge-item.earned .badge-name{color:var(--orange);}
+.badge-cond{font-size:9px;color:var(--muted);margin-top:2px;}
+.finish-wrap{text-align:center;padding:30px 0 20px;}
+.finish-big{font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:3px;color:var(--accent);line-height:1;margin-bottom:6px;}
+.finish-stats{display:flex;justify-content:center;gap:30px;margin-bottom:20px;}
+.finish-stat-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--accent);}
+.finish-stat-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted2);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px;font-family:inherit;letter-spacing:1px;text-transform:uppercase;}
+.popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.78);z-index:200;display:flex;align-items:flex-end;}
+.popup-box{background:var(--bg2);border-radius:20px 20px 0 0;border-top:1px solid var(--border2);padding:20px 16px calc(20px + env(safe-area-inset-bottom));width:100%;max-height:88vh;overflow-y:auto;}
+.popup-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px;}
+.popup-close{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--muted2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;letter-spacing:1px;text-transform:uppercase;}
+.popup-input{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg4);color:var(--text);font-size:15px;font-family:inherit;-webkit-user-select:text;user-select:text;margin-bottom:4px;}
+.popup-input-num{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg4);color:var(--text);font-size:20px;font-family:'DM Mono',monospace;text-align:center;-webkit-user-select:text;user-select:text;}
+.popup-field-label{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block;}
+.chart-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 12px;}
+canvas{max-width:100%;}
+/* How-to popup styles */
+.howto-muscle-wrap{display:flex;justify-content:center;margin:12px 0 16px;}
+.step-list{list-style:none;padding:0;margin:0;}
+.step-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:13px;color:var(--muted2);line-height:1.6;}
+.muscle-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-eyebrow">TRAIN LOG</div>
+  <div class="header-top">
+    <div class="header-title">TODAY</div>
+    <div id="header-streak"></div>
+  </div>
+</div>
+<div class="content" id="app"></div>
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('train')" id="nav-train"><span class="nav-icon">🏋️</span><span class="nav-label">Train</span></button>
+  <button class="nav-btn" onclick="switchTab('calendar')" id="nav-calendar"><span class="nav-icon">📅</span><span class="nav-label">Log</span></button>
+  <button class="nav-btn" onclick="switchTab('stats')" id="nav-stats"><span class="nav-icon">📊</span><span class="nav-label">Stats</span></button>
+  <button class="nav-btn" onclick="switchTab('body')" id="nav-body"><span class="nav-icon">👤</span><span class="nav-label">Body</span></button>
+  <button class="nav-btn" onclick="switchTab('custom')" id="nav-custom"><span class="nav-icon">⚙️</span><span class="nav-label">Custom</span></button>
+</nav>
+<div id="popup-wrap"></div>
+<script>
+var PARTS=[
+  {id:'chest',    en:'CHEST',    ja:'胸',   color:'#00e5a0'},
+  {id:'arm',      en:'ARM',      ja:'腕',   color:'#4d9fff'},
+  {id:'shoulder', en:'SHOULDER', ja:'肩',   color:'#a78bfa'},
+  {id:'back',     en:'BACK',     ja:'背中', color:'#ff8c42'},
+  {id:'abs',      en:'ABS',      ja:'腹',   color:'#ff4d6d'},
+  {id:'leg',      en:'LEG',      ja:'脚',   color:'#ffd700'},
+];
+
+// muscles: array of SVG path ids to highlight
+var EXERCISES={
+  chest:[
+    {id:'pushup', name:'腕立て伏せ',
+     desc:'大胸筋・上腕三頭筋を鍛える基本種目。体幹も同時に鍛えられる。',
+     muscles:['chest-l','chest-r','tricep-l','tricep-r'],
+     steps:['床に手を肩幅より少し広めにつき、つま先で体を支える','体をまっすぐに保ったまま、胸が床に近づくまで肘を曲げる','息を吐きながら腕を伸ばして元の位置に戻る','腰が落ちたり、お尻が上がらないよう体幹を意識する'],
+     plans:[{l:'初級',s:2,r:8},{l:'標準',s:3,r:12},{l:'上級',s:4,r:20}],toLimit:true},
+    {id:'widepushup', name:'ワイド腕立て',
+     desc:'手幅を広げ大胸筋外側に効かせる。胸の厚みと広がりを作る。',
+     muscles:['chest-l','chest-r'],
+     steps:['手を肩幅の1.5〜2倍に広げて床につく','指先は少し外側に向けると肘が安定する','胸を床ギリギリまで下ろし、大胸筋の伸びを感じる','押し上げる時に胸の筋肉を絞るイメージで行う'],
+     plans:[{l:'初級',s:2,r:8},{l:'標準',s:3,r:12},{l:'上級',s:4,r:15}],toLimit:false},
+    {id:'diampushup', name:'ダイヤモンド腕立て',
+     desc:'両手を菱形にする上級種目。二の腕と胸の内側に強く効く。',
+     muscles:['chest-l','chest-r','tricep-l','tricep-r'],
+     steps:['両手の親指と人差し指でひし形を作り、胸の下に置く','肘を体に沿わせるように曲げながら下ろす','胸がひし形に触れる直前まで下ろす','ゆっくりと押し上げ、肘を伸ばしきる'],
+     plans:[{l:'初級',s:2,r:5},{l:'標準',s:3,r:10},{l:'上級',s:3,r:15}],toLimit:true},
+  ],
+  arm:[
+    {id:'dip', name:'ディップス（椅子）',
+     desc:'椅子を使った二の腕の定番種目。上腕三頭筋の引き締めに最適。',
+     muscles:['tricep-l','tricep-r'],
+     steps:['椅子の端に手をかけ、足を前に伸ばして座る','肘を90度まで曲げながら体をゆっくり下ろす','上腕三頭筋に効いているか確認しながら行う','腕を伸ばして元の位置に戻る。肩をすくめないよう注意'],
+     plans:[{l:'初級',s:2,r:8},{l:'標準',s:3,r:12},{l:'上級',s:4,r:15}],toLimit:true},
+    {id:'chinup', name:'斜め懸垂',
+     desc:'テーブルを使った引く動作。上腕二頭筋と背中を同時に鍛える。',
+     muscles:['bicep-l','bicep-r','back-l','back-r'],
+     steps:['テーブルの下に仰向けに入り、縁を両手でつかむ','体をまっすぐに保ちながら胸をテーブルに近づける','肩甲骨を寄せるよう意識しながら引き上げる','ゆっくりと腕を伸ばして元の位置に戻る'],
+     plans:[{l:'初級',s:2,r:5},{l:'標準',s:3,r:8},{l:'上級',s:4,r:12}],toLimit:true},
+    {id:'hammercurl', name:'ハンマーカール',
+     desc:'前腕と上腕二頭筋を鍛え腕全体を太くする。ペットボトルで代用可。',
+     muscles:['bicep-l','bicep-r','forearm-l','forearm-r'],
+     steps:['両手に重りを持ち、親指が上を向くように構える','肘を体に固定したまま、ゆっくり重りを持ち上げる','肩の高さまで上げたら1秒キープする','ゆっくり元の位置に戻す。反動を使わないことが重要'],
+     plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:15},{l:'上級',s:4,r:20}],toLimit:false},
+  ],
+  shoulder:[
+    {id:'pikepushup', name:'パイクプッシュアップ',
+     desc:'お尻を高く上げた腕立て。三角筋全体に強く効く肩特化種目。',
+     muscles:['shoulder-l','shoulder-r','tricep-l','tricep-r'],
+     steps:['手を肩幅に開き、お尻を高く上げて逆V字になる','頭が床に近づくように肘を曲げて下ろす','首が前に出ないよう、頭と手の間に空間を保つ','腕を伸ばして元に戻す。肩の筋肉に集中する'],
+     plans:[{l:'初級',s:2,r:6},{l:'標準',s:3,r:10},{l:'上級',s:4,r:15}],toLimit:true},
+    {id:'lateralraise', name:'ラテラルレイズ',
+     desc:'腕を横に上げる動作。肩幅を広げる三角筋中部に効く種目。',
+     muscles:['shoulder-l','shoulder-r'],
+     steps:['両手にペットボトルを持ち、体の横に下ろす','肘を少し曲げた状態を維持しながら横に上げる','腕が肩の高さと平行になるまで上げる','ゆっくりと元の位置に戻す。反動を使わない'],
+     plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:15},{l:'上級',s:4,r:20}],toLimit:false},
+    {id:'shoulderpress', name:'肩プレス',
+     desc:'頭上に押し上げる動作で三角筋全体を鍛える。逞しい肩を作る。',
+     muscles:['shoulder-l','shoulder-r','tricep-l','tricep-r'],
+     steps:['ペットボトルを肩の高さで構え、肘を90度に曲げる','真上に腕を伸ばしながら持ち上げる','肘が耳の横に来るまで伸ばしきる','ゆっくり元の位置に戻す。腰を反らさないよう注意'],
+     plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:15},{l:'上級',s:4,r:20}],toLimit:false},
+  ],
+  back:[
+    {id:'superman', name:'スーパーマン',
+     desc:'床に伏せて体を反らす種目。脊柱起立筋を鍛え姿勢改善に効果的。',
+     muscles:['back-l','back-r'],
+     steps:['うつ伏せになり、両手を前に伸ばす','胸と脚を同時に床から持ち上げる','背中の筋肉をしっかり収縮させ2〜3秒キープ','ゆっくり元に戻す。首は自然な位置を保つ'],
+     plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:15},{l:'上級',s:4,r:20}],toLimit:false},
+    {id:'invrow', name:'斜め懸垂（テーブル）',
+     desc:'テーブルを使った引く動作。広背筋・僧帽筋で背中の厚みを作る。',
+     muscles:['back-l','back-r','bicep-l','bicep-r'],
+     steps:['テーブルの下に仰向けになり縁をつかむ','肩幅より広めにグリップし、足を前に伸ばす','肩甲骨を寄せながら胸をテーブルに引き寄せる','背中の筋肉の収縮を感じながらゆっくり下ろす'],
+     plans:[{l:'初級',s:2,r:5},{l:'標準',s:3,r:10},{l:'上級',s:4,r:12}],toLimit:true},
+    {id:'goodmorning', name:'グッドモーニング',
+     desc:'お辞儀動作で脊柱起立筋を鍛える。腰痛予防にも効果的な種目。',
+     muscles:['back-l','back-r','glute-l','glute-r'],
+     steps:['足を肩幅に開き、両手を頭の後ろで組む','背中をまっすぐに保ったまま上体を前に倒す','ハムストリングの伸びを感じながら45度まで傾ける','背筋を使って上体を起こす。膝は軽く曲げてOK'],
+     plans:[{l:'初級',s:2,r:12},{l:'標準',s:3,r:15},{l:'上級',s:4,r:20}],toLimit:false},
+  ],
+  abs:[
+    {id:'crunch', name:'クランチ',
+     desc:'腹直筋を集中的に鍛える基本種目。シックスパック形成の王道。',
+     muscles:['abs-l','abs-r'],
+     steps:['仰向けに寝て膝を90度に曲げ、手を頭の後ろに置く','首を引っ張らず、腹筋の力だけで肩を床から浮かせる','へそをのぞき込むイメージで丸まる','ゆっくり元に戻すが、肩は床につけない'],
+     plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:20},{l:'上級',s:4,r:30}],toLimit:false},
+    {id:'plank', name:'プランク（秒）',
+     desc:'体幹全体を等尺性収縮で鍛える。インナーマッスル強化に最適。',
+     muscles:['abs-l','abs-r','back-l','back-r'],
+     steps:['肘をついてうつ伏せになり、つま先で体を支える','頭・背中・腰・かかとが一直線になるよう調整','お腹を引き上げ、腰が落ちないよう維持する','呼吸を止めず、設定時間キープする'],
+     plans:[{l:'初級',s:2,r:20},{l:'標準',s:3,r:30},{l:'上級',s:3,r:60}],toLimit:false},
+    {id:'legrise', name:'レッグレイズ',
+     desc:'脚を上げる動作で腹直筋下部と腸腰筋を鍛える。下腹に効く。',
+     muscles:['abs-l','abs-r'],
+     steps:['仰向けになり両手を体の横に置く','足を伸ばしたまま、垂直になるまで上げる','ゆっくりと床ギリギリまで下ろす（床につけない）','腰が反らないように腹筋に力を入れ続ける'],
+     plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:15},{l:'上級',s:4,r:20}],toLimit:true},
+  ],
+  leg:[
+    {id:'squat', name:'スクワット',
+     desc:'大腿四頭筋・臀筋を鍛える全身運動の王様。代謝アップ効果大。',
+     muscles:['quad-l','quad-r','glute-l','glute-r','ham-l','ham-r'],
+     steps:['足を肩幅に開き、つま先を少し外側に向ける','胸を張り、背中をまっすぐに保つ','膝をつま先の向きに合わせながら太ももが水平になるまで下げる','かかとで床を押すように立ち上がる'],
+     plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:20},{l:'上級',s:4,r:30}],toLimit:false},
+    {id:'lunge', name:'ランジ',
+     desc:'片足ずつ鍛えて左右バランスを整える。お尻と太ももに効く。',
+     muscles:['quad-l','quad-r','glute-l','glute-r'],
+     steps:['足を揃えて立ち、片足を大きく前に踏み出す','前膝が90度、後ろ膝が床スレスレになるまで下ろす','前の足のかかとで床を押して元の位置に戻る','左右交互に行う。上体はまっすぐ保つ'],
+     plans:[{l:'初級',s:2,r:8},{l:'標準',s:3,r:12},{l:'上級',s:4,r:15}],toLimit:false},
+    {id:'calfraise', name:'カーフレイズ',
+     desc:'つま先立ちでふくらはぎを鍛える。むくみ解消にも効果的な種目。',
+     muscles:['calf-l','calf-r'],
+     steps:['足を腰幅に開いて立つ（壁に手を添えると安定する）','かかとをできるだけ高く持ち上げる','最高点で1〜2秒キープし、収縮を感じる','ゆっくりかかとを下ろす。床につける前に次の動作へ'],
+     plans:[{l:'初級',s:2,r:15},{l:'標準',s:3,r:20},{l:'上級',s:4,r:30}],toLimit:false},
+  ],
+};
+
+var TIPS=['筋肉は休息中に育ちます。睡眠をしっかり取ることが最大のトレーニングです。','プロテインは運動後30分以内に摂取すると効果的です。','同じ部位は48〜72時間の休息を入れると筋肉が育ちやすいです。','水分補給を忘れずに。パフォーマンスが大きく変わります。','正しいフォームなら、少ない回数でも十分な効果があります。','週3回を半年続けた人は、毎日やって1ヶ月で辞めた人より結果が出ます。','自重トレーニングは関節への負担が少なく、長く続けられます。','腹筋は毎日鍛えても回復が早い部位です。ただし、食事が9割。'];
+
+var BADGES=[
+  {id:'first',   emoji:'🌱',name:'FIRST STEP',  cond:'初めてのトレーニング',check:function(d){return d.total>=1;}},
+  {id:'str3',    emoji:'🔥',name:'3 DAY FIRE',  cond:'3日連続',            check:function(d){return d.streak>=3;}},
+  {id:'str7',    emoji:'⚡',name:'WEEK BEAST',  cond:'7日連続',            check:function(d){return d.streak>=7;}},
+  {id:'str30',   emoji:'💎',name:'IRON WILL',   cond:'30日連続',           check:function(d){return d.streak>=30;}},
+  {id:'rep100',  emoji:'💯',name:'100 REPS',    cond:'累計100回以上',      check:function(d){return d.reps>=100;}},
+  {id:'rep500',  emoji:'🏆',name:'500 REPS',    cond:'累計500回以上',      check:function(d){return d.reps>=500;}},
+  {id:'allparts',emoji:'🌟',name:'FULL BODY',   cond:'全6部位を制覇',      check:function(d){return d.parts>=6;}},
+  {id:'sess10',  emoji:'🎯',name:'10 SESSIONS', cond:'10回トレーニング',   check:function(d){return d.sessions>=10;}},
+  {id:'sess30',  emoji:'👑',name:'30 SESSIONS', cond:'30回トレーニング',   check:function(d){return d.sessions>=30;}},
+];
+
+
+// ===== LEVEL SYSTEM =====
+var LEVELS=[
+  {min:0,   max:99,   lv:1, name:'ROOKIE',   color:'rgba(255,255,255,0.3)'},
+  {min:100, max:299,  lv:2, name:'TRAINEE',  color:'#4d9fff'},
+  {min:300, max:599,  lv:3, name:'ATHLETE',  color:'#00e5a0'},
+  {min:600, max:999,  lv:4, name:'WARRIOR',  color:'#ff8c42'},
+  {min:1000,max:99999,lv:5, name:'LEGEND',   color:'#ffd700'},
+];
+
+function getLevel(reps){
+  for(var i=LEVELS.length-1;i>=0;i--){
+    if(reps>=LEVELS[i].min) return LEVELS[i];
+  }
+  return LEVELS[0];
+}
+var G_editPartId=null;var G_editIdx=null;
+var S={tab:'train',flow:'select_part',selectedPart:null,selectedEx:null,selectedPlan:1,currentSetIdx:0,setResults:[],todaySessions:[],calYear:new Date().getFullYear(),calMonth:new Date().getMonth(),records:{},tip:TIPS[Math.floor(Math.random()*TIPS.length)]};
+
+function objVals(o){var a=[];var ks=Object.keys(o);for(var i=0;i<ks.length;i++)a.push(o[ks[i]]);return a;}
+function load(){
+  try{
+    // Try current key first
+    var s=localStorage.getItem('trainlog_v1');
+    if(s){var p=JSON.parse(s);S.records=p.records||{};return;}
+    // Migrate from old keys
+    var oldKeys=['tl5','tl4','tl3','tl2','tl1','bm4','bm3'];
+    for(var i=0;i<oldKeys.length;i++){
+      var old=localStorage.getItem(oldKeys[i]);
+      if(old){var p=JSON.parse(old);S.records=p.records||{};save();return;}
+    }
+  }catch(e){}
+}
+function save(){try{localStorage.setItem('trainlog_v1',JSON.stringify({records:S.records}));}catch(e){}}
+function pad(n){return String(n).padStart(2,'0');}
+function todayKey(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function dateKey(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d);}
+function calcStreak(){var s=0;var t=new Date();t.setHours(0,0,0,0);for(var i=0;i<365;i++){var d=new Date(t.getTime());d.setDate(d.getDate()-i);var k=dateKey(d.getFullYear(),d.getMonth(),d.getDate());if(S.records[k]&&S.records[k].length>0)s++;else break;}return s;}
+function calcTotalReps(){var t=0;var vals=objVals(S.records);for(var i=0;i<vals.length;i++)for(var j=0;j<vals[i].length;j++)t+=vals[i][j].totalReps;return t;}
+function calcTotalSessions(){var t=0;var vals=objVals(S.records);for(var i=0;i<vals.length;i++)t+=vals[i].length;return t;}
+function calcPartReps(id){var t=0;var vals=objVals(S.records);for(var i=0;i<vals.length;i++)for(var j=0;j<vals[i].length;j++)if(vals[i][j].part===id)t+=vals[i][j].totalReps;return t;}
+function calcPartsUsed(){var u={};var vals=objVals(S.records);for(var i=0;i<vals.length;i++)for(var j=0;j<vals[i].length;j++)u[vals[i][j].part]=true;return Object.keys(u).length;}
+function calcMonthSessions(){var now=new Date();var t=0;var ks=Object.keys(S.records);for(var i=0;i<ks.length;i++){var p=ks[i].split('-');if(parseInt(p[0])===now.getFullYear()&&parseInt(p[1])-1===now.getMonth())t+=S.records[ks[i]].length;}return t;}
+function getBadgeData(){return{streak:calcStreak(),reps:calcTotalReps(),sessions:calcTotalSessions(),parts:calcPartsUsed(),total:calcTotalSessions()};}
+function getComment(){var sessions=S.todaySessions;if(!sessions.length)return 'お疲れ様！記録を保存しました。';var total=0;for(var i=0;i<sessions.length;i++)for(var j=0;j<sessions[i].sets.length;j++)total+=sessions[i].sets[j].reps;var yk=new Date();yk.setDate(yk.getDate()-1);var yKey=dateKey(yk.getFullYear(),yk.getMonth(),yk.getDate());var yRecs=S.records[yKey]||[];var yReps=0;for(var i=0;i<yRecs.length;i++)yReps+=yRecs[i].totalReps;if(yReps>0&&total>yReps)return '⬆️ 昨日より'+(total-yReps)+'回多い！絶好調！';if(total>=50)return '🔥 合計'+total+'回！今日は本気出たね！';return '💪 合計'+total+'回！着実に強くなってます！';}
+function closePopup(){document.getElementById('popup-wrap').innerHTML='';}
+function getPartColor(partId){for(var i=0;i<PARTS.length;i++)if(PARTS[i].id===partId)return PARTS[i].color;return '#00e5a0';}
+
+// ===== MUSCLE SVG =====
+function buildMuscleSVG(highlightIds, color) {
+  var c = color || '#00e5a0';
+  // muscle region fill colors
+  var def = 'rgba(255,255,255,0.06)';
+  function fc(id) {
+    for(var i=0;i<highlightIds.length;i++) if(highlightIds[i]===id) return c;
+    return def;
+  }
+  function sc(id) {
+    for(var i=0;i<highlightIds.length;i++) if(highlightIds[i]===id) return c;
+    return 'rgba(255,255,255,0.1)';
+  }
+  return '<svg viewBox="0 0 120 240" width="120" height="240" xmlns="http://www.w3.org/2000/svg">' +
+    // head
+    '<ellipse cx="60" cy="16" rx="13" ry="15" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>' +
+    // neck
+    '<rect x="54" y="29" width="12" height="10" rx="3" fill="rgba(255,255,255,0.07)"/>' +
+    // shoulders
+    '<ellipse id="shoulder-l" cx="32" cy="50" rx="16" ry="10" fill="'+fc('shoulder-l')+'" stroke="'+sc('shoulder-l')+'" stroke-width="0.8"/>' +
+    '<ellipse id="shoulder-r" cx="88" cy="50" rx="16" ry="10" fill="'+fc('shoulder-r')+'" stroke="'+sc('shoulder-r')+'" stroke-width="0.8"/>' +
+    // chest
+    '<path id="chest-l" d="M44 40 Q38 52 44 66 Q52 70 60 68 L60 38 Z" fill="'+fc('chest-l')+'" stroke="'+sc('chest-l')+'" stroke-width="0.8"/>' +
+    '<path id="chest-r" d="M76 40 Q82 52 76 66 Q68 70 60 68 L60 38 Z" fill="'+fc('chest-r')+'" stroke="'+sc('chest-r')+'" stroke-width="0.8"/>' +
+    // upper arms (bicep)
+    '<rect id="bicep-l" x="17" y="54" width="14" height="28" rx="6" fill="'+fc('bicep-l')+'" stroke="'+sc('bicep-l')+'" stroke-width="0.8"/>' +
+    '<rect id="bicep-r" x="89" y="54" width="14" height="28" rx="6" fill="'+fc('bicep-r')+'" stroke="'+sc('bicep-r')+'" stroke-width="0.8"/>' +
+    // triceps (behind arms - shown as border)
+    '<rect id="tricep-l" x="15" y="56" width="14" height="26" rx="6" fill="'+fc('tricep-l')+'" stroke="'+sc('tricep-l')+'" stroke-width="1.2" fill-opacity="0.7"/>' +
+    '<rect id="tricep-r" x="91" y="56" width="14" height="26" rx="6" fill="'+fc('tricep-r')+'" stroke="'+sc('tricep-r')+'" stroke-width="1.2" fill-opacity="0.7"/>' +
+    // forearms
+    '<rect id="forearm-l" x="18" y="84" width="12" height="26" rx="5" fill="'+fc('forearm-l')+'" stroke="'+sc('forearm-l')+'" stroke-width="0.8"/>' +
+    '<rect id="forearm-r" x="90" y="84" width="12" height="26" rx="5" fill="'+fc('forearm-r')+'" stroke="'+sc('forearm-r')+'" stroke-width="0.8"/>' +
+    // abs
+    '<rect id="abs-l" x="48" y="68" width="10" height="38" rx="4" fill="'+fc('abs-l')+'" stroke="'+sc('abs-l')+'" stroke-width="0.8"/>' +
+    '<rect id="abs-r" x="62" y="68" width="10" height="38" rx="4" fill="'+fc('abs-r')+'" stroke="'+sc('abs-r')+'" stroke-width="0.8"/>' +
+    // back
+    '<rect id="back-l" x="44" y="40" width="13" height="46" rx="4" fill="'+fc('back-l')+'" stroke="'+sc('back-l')+'" stroke-width="0.8" opacity="0.7"/>' +
+    '<rect id="back-r" x="63" y="40" width="13" height="46" rx="4" fill="'+fc('back-r')+'" stroke="'+sc('back-r')+'" stroke-width="0.8" opacity="0.7"/>' +
+    // glutes
+    '<ellipse id="glute-l" cx="50" cy="114" rx="11" ry="10" fill="'+fc('glute-l')+'" stroke="'+sc('glute-l')+'" stroke-width="0.8"/>' +
+    '<ellipse id="glute-r" cx="70" cy="114" rx="11" ry="10" fill="'+fc('glute-r')+'" stroke="'+sc('glute-r')+'" stroke-width="0.8"/>' +
+    // quads
+    '<rect id="quad-l" x="42" y="122" width="17" height="44" rx="7" fill="'+fc('quad-l')+'" stroke="'+sc('quad-l')+'" stroke-width="0.8"/>' +
+    '<rect id="quad-r" x="61" y="122" width="17" height="44" rx="7" fill="'+fc('quad-r')+'" stroke="'+sc('quad-r')+'" stroke-width="0.8"/>' +
+    // hamstrings
+    '<rect id="ham-l" x="43" y="124" width="15" height="40" rx="6" fill="'+fc('ham-l')+'" stroke="'+sc('ham-l')+'" stroke-width="0.8" opacity="0.6"/>' +
+    '<rect id="ham-r" x="62" y="124" width="15" height="40" rx="6" fill="'+fc('ham-r')+'" stroke="'+sc('ham-r')+'" stroke-width="0.8" opacity="0.6"/>' +
+    // calves
+    '<ellipse id="calf-l" cx="51" cy="196" rx="9" ry="18" fill="'+fc('calf-l')+'" stroke="'+sc('calf-l')+'" stroke-width="0.8"/>' +
+    '<ellipse id="calf-r" cx="69" cy="196" rx="9" ry="18" fill="'+fc('calf-r')+'" stroke="'+sc('calf-r')+'" stroke-width="0.8"/>' +
+  '</svg>';
+}
+
+// ===== HOWTO POPUP =====
+function showHowto(exId, partId, fromRecording) {
+  var exList = EXERCISES[partId];
+  var ex = null;
+  for(var i=0;i<exList.length;i++) if(exList[i].id===exId){ex=exList[i];break;}
+  if(!ex) return;
+  var color = getPartColor(partId);
+  var wrap = document.getElementById('popup-wrap');
+  var h = '<div class="popup-overlay" id="howto-ol"><div class="popup-box">';
+  h += '<div class="popup-title" style="color:'+color+'">'+ex.name+'</div>';
+  h += '<div style="font-size:12px;color:var(--muted2);margin-bottom:14px;line-height:1.6">'+ex.desc+'</div>';
+  // muscle SVG
+  h += '<div class="muscle-label">効く筋肉</div>';
+  h += '<div class="howto-muscle-wrap">'+buildMuscleSVG(ex.muscles, color)+'</div>';
+  // steps
+  h += '<div style="font-size:9px;font-weight:800;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">やり方</div>';
+  h += '<ul class="step-list">';
+  for(var i=0;i<ex.steps.length;i++){
+    h += '<li class="step-item">'+
+      '<div class="step-num" style="background:'+color+'22;color:'+color+'">'+(i+1)+'</div>'+
+      '<div class="step-text">'+ex.steps[i]+'</div>'+
+    '</li>';
+  }
+  h += '</ul>';
+  if(!fromRecording){
+    h += '<button onclick="closePopupAndStart(\''+exId+'\',\''+partId+'\')" class="action-btn primary" style="margin-top:16px">この種目でスタート →</button>';
+  }
+  h += '<button class="popup-close" onclick="closePopup()">CLOSE</button>';
+  h += '</div></div>';
+  wrap.innerHTML = h;
+  var ol = document.getElementById('howto-ol');
+  if(ol) ol.addEventListener('click', function(e){if(e.target===this)closePopup();});
+}
+
+function closePopupAndStart(exId, partId) {
+  closePopup();
+  S.selectedPart = partId;
+  var list = EXERCISES[partId];
+  for(var i=0;i<list.length;i++) if(list[i].id===exId){S.selectedEx=list[i];break;}
+  S.selectedPlan = 1;
+  S.flow = 'select_plan';
+  render();
+}
+
+function switchTab(t){
+  S.tab=t;
+  var tabs=['train','calendar','stats','body','custom'];
+  for(var i=0;i<tabs.length;i++) document.getElementById('nav-'+tabs[i]).classList[tabs[i]===t?'add':'remove']('active');
+  render();
+}
+
+function render(){
+  var app=document.getElementById('app');if(!app)return;
+  var streak=calcStreak();
+  var sh=document.getElementById('header-streak');
+  if(sh)sh.innerHTML=streak>0?'<span class="header-streak">🔥 '+streak+' DAY STREAK</span>':'';
+  if(S.tab==='train')app.innerHTML=renderTrain();
+  else if(S.tab==='calendar')app.innerHTML=renderCalendar();
+  else if(S.tab==='stats')app.innerHTML=renderStats();
+  else if(S.tab==='custom')app.innerHTML=renderCustom();
+  else{app.innerHTML=renderBody();drawCharts();}
+}
+
+function renderTrain(){
+  if(S.flow==='select_part')return renderSelectPart();
+  if(S.flow==='select_ex')return renderSelectEx();
+  if(S.flow==='select_plan')return renderSelectPlan();
+  if(S.flow==='recording')return renderRecording();
+  if(S.flow==='finish')return renderFinish();
+  return '';
+}
+
+function renderSelectPart(){
+  var h='<div class="tip-card"><span style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--purple)">💡 TIPS — </span>'+S.tip+'</div>';
+  h+='<div class="card"><div class="section-label">部位を選択</div><div class="part-grid">';
+  for(var i=0;i<PARTS.length;i++){
+    var p=PARTS[i];var c=p.color;
+    h+='<button class="part-btn" style="border-color:'+c+'44" onclick="selectPart(\''+p.id+'\')">'+
+      '<span class="part-en" style="color:'+c+'">'+p.en+'</span>'+
+      '<span class="part-ja" style="color:'+c+'99">'+p.ja+'</span>'+
+      '<div class="part-line" style="background:'+c+';opacity:0.6"></div>'+
+    '</button>';
+  }
+  h+='</div></div>';
+  if(S.todaySessions.length>0){
+    h+='<div class="card"><div class="section-label">今日の記録</div>';
+    for(var i=0;i<S.todaySessions.length;i++){
+      var sess=S.todaySessions[i];var total=0;
+      for(var j=0;j<sess.sets.length;j++)total+=sess.sets[j].reps;
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">'+
+        '<div><div style="font-size:13px;font-weight:600">'+sess.exName+'</div>'+
+        '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px">'+sess.sets.length+' SETS</div></div>'+
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:var(--accent)">'+total+'<span style="font-size:11px;color:var(--muted);font-family:DM Sans,sans-serif"> reps</span></div>'+
+      '</div>';
+    }
+    h+='<button class="action-btn primary" style="margin-top:14px" onclick="finishAll()">FINISH TODAY</button></div>';
+  }
+  return h;
+}
+
+function selectPart(id){S.selectedPart=id;S.flow='select_ex';render();}
+
+function renderSelectEx(){
+  var part=null;for(var i=0;i<PARTS.length;i++)if(PARTS[i].id===S.selectedPart){part=PARTS[i];break;}
+  var c=part?part.color:'#00e5a0';
+  var h='<button class="back-btn" onclick="S.flow=\'select_part\';render()">← BACK</button>';
+  h+='<div class="card"><div class="section-label" style="color:'+c+'">'+part.en+' — 種目を選ぶ</div>';
+  var exList=EXERCISES[S.selectedPart];
+  for(var i=0;i<exList.length;i++){
+    var ex=exList[i];
+    h+='<div class="ex-item">'+
+      '<div class="ex-item-top">'+
+        '<div style="flex:1;min-width:0">'+
+          '<div class="ex-name">'+ex.name+'</div>'+
+          '<div class="ex-desc">'+ex.desc+'</div>'+
+          (ex.toLimit?'<span class="ex-badge">LIMIT SET</span>':'')+
+        '</div>'+
+      '</div>'+
+      '<div class="ex-info-row">'+
+        '<button class="ex-info-btn" onclick="showHowto(\''+ex.id+'\',\''+S.selectedPart+'\',false)">📖 やり方</button>'+
+        '<button class="ex-start-btn" onclick="selectEx(\''+ex.id+'\')">この種目でスタート →</button>'+
+      '</div>'+
+    '</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function selectEx(id){
+  var list=EXERCISES[S.selectedPart];
+  for(var i=0;i<list.length;i++){if(list[i].id===id){S.selectedEx=list[i];break;}}
+  S.selectedPlan=1;S.flow='select_plan';render();
+}
+
+function renderSelectPlan(){
+  var ex=S.selectedEx;
+  var h='<button class="back-btn" onclick="S.flow=\'select_ex\';render()">← BACK</button>';
+  h+='<div class="card"><div class="section-label">'+ex.name+' — プランを選ぶ</div><div class="plan-row">';
+  for(var i=0;i<ex.plans.length;i++){
+    var plan=ex.plans[i];
+    h+='<button class="plan-btn'+(S.selectedPlan===i?' active':'')+'" onclick="S.selectedPlan='+i+';render()">'+
+      '<div class="plan-level">'+plan.l+'</div>'+
+      '<div class="plan-detail">'+plan.s+'SET × '+plan.r+'rep'+(ex.toLimit&&i===ex.plans.length-1?'+LIMIT':'')+'</div>'+
+    '</button>';
+  }
+  h+='</div></div>';
+  h+='<button class="action-btn primary" onclick="startRecording()">START →</button>';
+  return h;
+}
+
+function startRecording(){S.currentSetIdx=0;S.setResults=[];S.flow='recording';render();}
+
+function renderRecording(){
+  var ex=S.selectedEx;var plan=ex.plans[S.selectedPlan];
+  var totalSets=plan.s+(ex.toLimit?1:0);
+  var pct=totalSets>0?Math.round(S.currentSetIdx/totalSets*100):0;
+  var h='<div class="card" style="margin-bottom:10px">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+    '<div style="font-size:15px;font-weight:700">'+ex.name+'</div>'+
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--muted)">'+S.currentSetIdx+' / '+totalSets+'</div></div>'+
+    '<div class="prog-wrap"><div class="prog-bar" style="width:'+pct+'%"></div></div></div>';
+  // やり方ボタン
+  h+='<button class="howto-btn" onclick="showHowto(\''+ex.id+'\',\''+S.selectedPart+'\',true)">📖 やり方・効く筋肉を確認する</button>';
+  for(var i=0;i<S.setResults.length;i++){
+    var res=S.setResults[i];var isLim=ex.toLimit&&i===plan.s;
+    h+='<div class="set-record-card">'+
+      '<div class="set-num">'+(isLim?'LIMIT SET':'SET '+(i+1))+'</div>'+
+      '<div style="margin-top:8px;display:flex;align-items:center;gap:8px">'+
+      (res.giveup?'<span class="set-giveup-label">GIVE UP — '+res.reps+' reps</span>':
+        '<span class="set-done-num">'+res.reps+'</span><span style="font-size:11px;color:var(--muted);margin-left:4px">reps</span>')+
+      '</div></div>';
+  }
+  if(S.currentSetIdx<totalSets){
+    var isLimitSet=ex.toLimit&&S.currentSetIdx===plan.s;
+    h+='<div class="set-record-card active-set">'+
+      '<div class="set-num" style="color:var(--accent)">'+(isLimitSet?'🔥 LIMIT SET — 限界まで！':'SET '+(S.currentSetIdx+1)+' / '+totalSets)+'</div>'+
+      '<input type="number" id="rep-input" class="rep-input" value="'+(isLimitSet?'':plan.r)+'" min="0" placeholder="0">'+
+      '<span class="rep-label">REPS</span>'+
+      '<button class="done-btn-big" onclick="doneSet()">✓ DONE</button>'+
+      '<button class="giveup-btn-big" onclick="doGiveup()">GIVE UP</button>'+
+    '</div>';
+    h+='<button class="cancel-ex-btn" onclick="cancelExercise()">← CANCEL EXERCISE</button>';
+  }
+  if(S.currentSetIdx>=totalSets){
+    h+='<button class="action-btn primary" onclick="finishExercise()">✓ COMPLETE</button>';
+    h+='<button class="cancel-ex-btn" onclick="cancelExercise()">← CANCEL EXERCISE</button>';
+  }
+  return h;
+}
+
+function doneSet(){var i=document.getElementById('rep-input');S.setResults.push({reps:i?parseInt(i.value)||0:0,giveup:false});S.currentSetIdx++;render();}
+function doGiveup(){var i=document.getElementById('rep-input');S.setResults.push({reps:i?parseInt(i.value)||0:0,giveup:true});S.currentSetIdx++;render();}
+function cancelExercise(){S.setResults=[];S.currentSetIdx=0;S.flow='select_part';render();}
+
+function finishExercise(){
+  var ex=S.selectedEx;var total=0;
+  for(var i=0;i<S.setResults.length;i++)total+=S.setResults[i].reps;
+  S.todaySessions.push({part:S.selectedPart,exId:ex.id,exName:ex.name,plan:ex.plans[S.selectedPlan].l,sets:S.setResults.slice(),totalReps:total});
+  S.flow='select_part';S.tip=TIPS[Math.floor(Math.random()*TIPS.length)];render();
+}
+function finishAll(){
+  var tk=todayKey();if(!S.records[tk])S.records[tk]=[];
+  for(var i=0;i<S.todaySessions.length;i++)S.records[tk].push(S.todaySessions[i]);
+  save();S.flow='finish';render();
+}
+function renderFinish(){
+  var total=0;for(var i=0;i<S.todaySessions.length;i++)for(var j=0;j<S.todaySessions[i].sets.length;j++)total+=S.todaySessions[i].sets[j].reps;
+  var h='<div class="finish-wrap"><div class="finish-big">DONE!</div>'+
+    '<div class="finish-stats">'+
+    '<div class="finish-stat"><div class="finish-stat-num">'+S.todaySessions.length+'</div><div class="finish-stat-label">EXERCISES</div></div>'+
+    '<div class="finish-stat"><div class="finish-stat-num">'+total+'</div><div class="finish-stat-label">TOTAL REPS</div></div>'+
+    '</div><div class="comment-card"><div class="comment-text">'+getComment()+'</div></div></div>';
+  var bd=getBadgeData();var newB=[];for(var i=0;i<BADGES.length;i++)if(BADGES[i].check(bd))newB.push(BADGES[i]);
+  if(newB.length){h+='<div class="card"><div class="section-label">🏆 獲得バッジ</div><div class="badge-grid">';for(var i=0;i<newB.length;i++)h+='<div class="badge-item earned"><div class="badge-emoji">'+newB[i].emoji+'</div><div class="badge-name">'+newB[i].name+'</div></div>';h+='</div></div>';}
+  h+='<button class="action-btn primary" onclick="S.todaySessions=[];S.flow=\'select_part\';S.tip=TIPS[Math.floor(Math.random()*TIPS.length)];render()">+ ADD MORE</button>';
+  h+='<button class="action-btn secondary" onclick="S.todaySessions=[];S.flow=\'select_part\';switchTab(\'stats\')">VIEW STATS →</button>';
+  return h;
+}
+
+function renderCalendar(){
+  var y=S.calYear;var m=S.calMonth;var firstDow=new Date(y,m,1).getDay();var dim=new Date(y,m+1,0).getDate();
+  var mNames=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];var tk=todayKey();
+  var h='<div class="card"><div class="cal-nav-row">'+
+    '<button class="cal-nav-btn" onclick="S.calMonth--;if(S.calMonth<0){S.calMonth=11;S.calYear--;}render()">‹</button>'+
+    '<div class="cal-month">'+mNames[m]+' '+y+'</div>'+
+    '<button class="cal-nav-btn" onclick="S.calMonth++;if(S.calMonth>11){S.calMonth=0;S.calYear++;}render()">›</button>'+
+    '</div><div class="cal-grid">'+['SU','MO','TU','WE','TH','FR','SA'].map(function(d){return '<div class="cal-dow">'+d+'</div>';}).join('');
+  for(var i=0;i<firstDow;i++)h+='<div class="cal-cell empty"></div>';
+  for(var d=1;d<=dim;d++){var k=dateKey(y,m,d);var hasW=S.records[k]&&S.records[k].length>0;var isT=k===tk;var dow=new Date(y,m,d).getDay();h+='<button class="cal-cell'+(hasW?' has-workout':'')+(isT?' today':'')+'" onclick="showDay(\''+k+'\')" style="'+(dow===0||dow===6?'opacity:0.4;':'')+'">'+d+(hasW?'<div class="cal-dot"></div>':'')+'</button>';}
+  h+='</div></div>';
+  var monthKeys=[];for(var dd=1;dd<=dim;dd++){var kk=dateKey(y,m,dd);if(S.records[kk]&&S.records[kk].length>0)monthKeys.push(kk);}
+  if(monthKeys.length){h+='<div class="card"><div class="section-label">'+mNames[m]+' SESSIONS</div>';for(var i=0;i<monthKeys.length;i++){var kk=monthKeys[i];var ss=S.records[kk];var t=0;for(var j=0;j<ss.length;j++)t+=ss[j].totalReps;var names=[];for(var j=0;j<ss.length;j++)names.push(ss[j].exName);h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showDay(\''+kk+'\')"><div><div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:1px">'+kk.split('-')[2]+' '+mNames[m]+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+names.join(' · ')+'</div></div><div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:var(--accent)">'+t+'<span style="font-size:10px;font-family:DM Sans,sans-serif;color:var(--muted)"> reps</span></div></div>';}h+='</div>';}
+  return h;
+}
+function showDay(k){
+  var ss=S.records[k]||[];var p=k.split('-');var wrap=document.getElementById('popup-wrap');
+  var inner='<div class="popup-overlay" id="day-ol"><div class="popup-box"><div class="popup-title">'+p[2]+' / '+p[1]+' / '+p[0]+'</div>';
+  if(!ss.length){inner+='<div style="color:var(--muted);font-size:14px;padding:20px 0;text-align:center;letter-spacing:2px">NO RECORD</div>';}
+  else{for(var i=0;i<ss.length;i++){var sess=ss[i];var t=0;for(var j=0;j<sess.sets.length;j++)t+=sess.sets[j].reps;inner+='<div style="padding:12px 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="font-size:14px;font-weight:700">'+sess.exName+'</div><div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--accent)">'+t+' reps</div></div>';for(var j=0;j<sess.sets.length;j++){var st=sess.sets[j];inner+='<div style="font-size:11px;color:var(--muted);letter-spacing:1px;margin-left:8px">SET '+(j+1)+' — '+(st.giveup?st.reps+' reps (GIVE UP)':st.reps+' reps')+'</div>';}inner+='</div>';}}
+  inner+='<button class="popup-close" onclick="closePopup()">CLOSE</button></div></div>';
+  wrap.innerHTML=inner;var ol=document.getElementById('day-ol');if(ol)ol.addEventListener('click',function(e){if(e.target===this)closePopup();});
+}
+
+function renderStats(){
+  var streak=calcStreak();var totalReps=calcTotalReps();var totalSess=calcTotalSessions();var monthSess=calcMonthSessions();
+  var h='<div class="stats-row"><div class="stat-card"><div class="stat-num" style="color:var(--orange)">'+streak+'</div><div class="stat-label">Day Streak</div></div><div class="stat-card"><div class="stat-num" style="color:var(--accent)">'+monthSess+'</div><div class="stat-label">This Month</div></div><div class="stat-card"><div class="stat-num" style="color:var(--blue)">'+totalReps+'</div><div class="stat-label">Total Reps</div></div><div class="stat-card"><div class="stat-num" style="color:var(--accent)">'+totalSess+'</div><div class="stat-label">Sessions</div></div></div>';
+  var maxR=1;for(var i=0;i<PARTS.length;i++){var r=calcPartReps(PARTS[i].id);if(r>maxR)maxR=r;}
+  h+='<div class="card"><div class="section-label">部位別 レベル＆累計回数</div>';
+  for(var i=0;i<PARTS.length;i++){var reps=calcPartReps(PARTS[i].id);var pct=Math.round(reps/maxR*100);h+='<div class="part-stat-row"><span class="part-stat-en" style="color:'+PARTS[i].color+'">'+PARTS[i].en+'</span><div style="flex:1"><div class="part-stat-count">'+reps+' reps</div></div><div class="part-bar-wrap"><div class="part-bar" style="width:'+pct+'%;background:'+PARTS[i].color+'"></div></div></div>';}
+  // level display
+  h+='<div style="margin-top:4px">';
+  for(var i=0;i<PARTS.length;i++){
+    var reps=calcPartReps(PARTS[i].id);
+    var lv=getLevel(reps);
+    var nextLv=lv.lv<5?LEVELS[lv.lv]:null;
+    var pct=nextLv?Math.round((reps-lv.min)/(nextLv.min-lv.min)*100):100;
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">'+
+      '<span style="font-family:Bebas Neue,sans-serif;font-size:15px;letter-spacing:1px;color:'+PARTS[i].color+';width:68px">'+PARTS[i].en+'</span>'+
+      '<div style="display:flex;flex-direction:column;flex:1;gap:3px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center">'+
+          '<span style="font-family:Bebas Neue,sans-serif;font-size:13px;letter-spacing:1px;color:'+lv.color+'">Lv'+lv.lv+' '+lv.name+'</span>'+
+          '<span style="font-size:10px;color:var(--muted)">'+reps+'回'+(nextLv?' / 次: '+nextLv.min+'回':'（MAX）')+'</span>'+
+        '</div>'+
+        '<div style="height:4px;background:var(--bg4);border-radius:2px">'+
+          '<div style="height:4px;border-radius:2px;background:'+lv.color+';width:'+pct+'%"></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+  h+='</div></div>';
+  var bd=getBadgeData();h+='<div class="card"><div class="section-label">BADGES</div><div class="badge-grid">';
+  for(var i=0;i<BADGES.length;i++){var e=BADGES[i].check(bd);h+='<div class="badge-item'+(e?' earned':'')+'"><div class="badge-emoji">'+(e?BADGES[i].emoji:'🔒')+'</div><div class="badge-name">'+BADGES[i].name+'</div><div class="badge-cond">'+BADGES[i].cond+'</div></div>';}
+  h+='</div></div>';return h;
+}
+
+function renderBody(){
+  return '<div class="card"><div class="section-label">BODY BALANCE — レーダーチャート</div><div class="chart-wrap"><canvas id="radar-chart" width="280" height="280"></canvas></div></div>'+
+    '<div class="card"><div class="section-label">PROGRESS — 部位別 累計推移</div><div class="chart-wrap"><canvas id="line-chart" width="320" height="220"></canvas></div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">'+(function(){var s='';for(var i=0;i<PARTS.length;i++)s+='<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:2px;background:'+PARTS[i].color+'"></div><span style="font-size:10px;color:var(--muted2);font-weight:700;letter-spacing:1px">'+PARTS[i].en+'</span></div>';return s;})()+'</div></div>';
+}
+
+function drawCharts(){drawRadar();drawLine();}
+function drawRadar(){
+  var canvas=document.getElementById('radar-chart');if(!canvas)return;
+  var ctx=canvas.getContext('2d');var W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=100,n=6;
+  ctx.clearRect(0,0,W,H);
+  var partReps=[];var maxR=1;for(var i=0;i<PARTS.length;i++){var r=calcPartReps(PARTS[i].id);partReps.push(r);if(r>maxR)maxR=r;}
+  for(var g=1;g<=4;g++){ctx.beginPath();for(var i=0;i<n;i++){var angle=-Math.PI/2+i*2*Math.PI/n;var x=cx+(R*g/4)*Math.cos(angle),y=cy+(R*g/4)*Math.sin(angle);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.closePath();ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;ctx.stroke();}
+  for(var i=0;i<n;i++){var angle=-Math.PI/2+i*2*Math.PI/n;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(angle),cy+R*Math.sin(angle));ctx.strokeStyle='rgba(255,255,255,0.09)';ctx.lineWidth=1;ctx.stroke();}
+  // find highest level for fill color
+  var topLv=LEVELS[0];
+  for(var i=0;i<PARTS.length;i++){var lv=getLevel(partReps[i]);if(lv.lv>topLv.lv)topLv=lv;}
+  ctx.beginPath();for(var i=0;i<n;i++){var angle=-Math.PI/2+i*2*Math.PI/n;var r=R*(partReps[i]/maxR);var x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.closePath();
+  ctx.fillStyle=topLv.color.replace(')',',0.15)').replace('rgba','rgba').replace('rgb(','rgba(').replace('#','');
+  // safe fill
+  ctx.fillStyle='rgba(0,229,160,0.1)';ctx.fill();
+  ctx.strokeStyle=topLv.color;ctx.lineWidth=2;ctx.stroke();
+  for(var i=0;i<n;i++){
+    var angle=-Math.PI/2+i*2*Math.PI/n;
+    var r=R*(partReps[i]/maxR);
+    var x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle);
+    var lv=getLevel(partReps[i]);
+    // dot with level color
+    ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.fillStyle=lv.color;ctx.fill();
+    // label
+    var lx=cx+(R+22)*Math.cos(angle),ly=cy+(R+22)*Math.sin(angle);
+    ctx.font='bold 9px sans-serif';ctx.fillStyle='rgba(255,255,255,0.65)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(PARTS[i].en,lx,ly);
+    // level badge near dot
+    ctx.font='bold 8px sans-serif';ctx.fillStyle=lv.color;
+    ctx.fillText('Lv'+lv.lv,lx,ly+12);
+  }
+}
+function drawLine(){
+  var canvas=document.getElementById('line-chart');if(!canvas)return;
+  var ctx=canvas.getContext('2d');var W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);
+  var PAD={t:20,r:20,b:40,l:44};var cW=W-PAD.l-PAD.r,cH=H-PAD.t-PAD.b;
+  var allDates=Object.keys(S.records).sort();
+  if(allDates.length===0){ctx.font='12px sans-serif';ctx.fillStyle='rgba(255,255,255,0.25)';ctx.textAlign='center';ctx.fillText('記録がありません',W/2,H/2);return;}
+  var timelines=[];var maxVal=1;
+  for(var pi=0;pi<PARTS.length;pi++){var cumul=0;var line=[];for(var di=0;di<allDates.length;di++){var recs=S.records[allDates[di]]||[];for(var ri=0;ri<recs.length;ri++)if(recs[ri].part===PARTS[pi].id)cumul+=recs[ri].totalReps;line.push(cumul);if(cumul>maxVal)maxVal=cumul;}timelines.push(line);}
+  for(var g=0;g<=4;g++){var y=PAD.t+cH*(1-g/4);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cW,y);ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;ctx.stroke();ctx.font='9px sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.textAlign='right';ctx.fillText(Math.round(maxVal*g/4),PAD.l-6,y+4);}
+  for(var pi=0;pi<timelines.length;pi++){var data=timelines[pi];var hasData=false;for(var di=0;di<data.length;di++)if(data[di]>0){hasData=true;break;}if(!hasData)continue;ctx.beginPath();for(var di=0;di<data.length;di++){var x=PAD.l+(allDates.length>1?cW*di/(allDates.length-1):cW/2);var y=PAD.t+cH*(1-data[di]/maxVal);if(di===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.strokeStyle=PARTS[pi].color;ctx.lineWidth=2;ctx.stroke();var lx=PAD.l+(allDates.length>1?cW:cW/2);var ly=PAD.t+cH*(1-data[data.length-1]/maxVal);ctx.beginPath();ctx.arc(lx,ly,4,0,2*Math.PI);ctx.fillStyle=PARTS[pi].color;ctx.fill();}
+  var step=Math.ceil(allDates.length/4);for(var di=0;di<allDates.length;di++){if(di%step===0||di===allDates.length-1){var x=PAD.l+(allDates.length>1?cW*di/(allDates.length-1):cW/2);var p=allDates[di].split('-');ctx.font='9px sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.textAlign='center';ctx.fillText(p[1]+'/'+p[2],x,H-PAD.b+14);}}
+}
+
+function renderCustom(){
+  var h='<div class="card" style="margin-bottom:8px"><div class="section-label">種目のカスタマイズ</div><div style="font-size:12px;color:var(--muted2);line-height:1.7">部位ごとに種目を追加・編集・削除できます。</div></div>';
+  for(var pi=0;pi<PARTS.length;pi++){
+    var part=PARTS[pi];
+    h+='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px;color:'+part.color+'">'+part.en+'</div><button onclick="openAddEx(\''+part.id+'\')" style="background:var(--accent-dim);border:1px solid rgba(0,229,160,0.3);color:var(--accent);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:1px">+ ADD</button></div>';
+    var exList=EXERCISES[part.id];
+    for(var ei=0;ei<exList.length;ei++){
+      var ex=exList[ei];
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">'+
+        '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text)">'+ex.name+'</div>'+
+        '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+ex.plans[0].l+':'+ex.plans[0].s+'×'+ex.plans[0].r+' / '+ex.plans[1].l+':'+ex.plans[1].s+'×'+ex.plans[1].r+' / '+ex.plans[2].l+':'+ex.plans[2].s+'×'+ex.plans[2].r+'</div></div>'+
+        '<div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px">'+
+        '<button onclick="openEditEx(\''+part.id+'\','+ei+')" style="background:var(--bg4);border:1px solid var(--border2);color:var(--muted2);padding:6px 10px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">EDIT</button>'+
+        '<button onclick="deleteEx(\''+part.id+'\','+ei+')" style="background:var(--red-dim);border:1px solid rgba(255,77,109,0.2);color:var(--red);padding:6px 10px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">DEL</button>'+
+        '</div></div>';
+    }
+    h+='</div>';
+  }
+  return h;
+}
+function deleteEx(partId,idx){if(EXERCISES[partId].length<=1){alert('最低1つの種目が必要です');return;}EXERCISES[partId].splice(idx,1);render();}
+function openAddEx(partId){G_editPartId=partId;G_editIdx=null;showExPopup(null);}
+function openEditEx(partId,idx){G_editPartId=partId;G_editIdx=idx;showExPopup(EXERCISES[partId][idx]);}
+function showExPopup(existing){
+  var ex=existing||{name:'',desc:'',plans:[{l:'初級',s:2,r:10},{l:'標準',s:3,r:15},{l:'上級',s:4,r:20}],toLimit:false};
+  var isEdit=(G_editIdx!==null&&G_editIdx!==undefined);
+  var wrap=document.getElementById('popup-wrap');
+  var h='<div class="popup-overlay" id="ex-ol"><div class="popup-box"><div class="popup-title">'+(isEdit?'種目を編集':'種目を追加')+'</div>';
+  h+='<span class="popup-field-label">種目名</span><input type="text" id="ex-name-inp" class="popup-input" value="'+ex.name+'" placeholder="例：腕立て伏せ" style="margin-bottom:4px">';
+  h+='<span class="popup-field-label" style="margin-top:10px">説明文</span><input type="text" id="ex-desc-inp" class="popup-input" value="'+(ex.desc||'')+'" placeholder="例：大胸筋を鍛える種目" style="margin-bottom:14px">';
+  var labels=['初級','標準','上級'];
+  for(var i=0;i<3;i++){h+='<div style="margin-bottom:12px"><span class="popup-field-label">'+labels[i]+' プラン</span><div style="display:flex;gap:8px"><div style="flex:1"><div style="font-size:9px;color:var(--muted);margin-bottom:4px">セット数</div><input type="number" id="ps'+i+'" class="popup-input-num" value="'+ex.plans[i].s+'" min="1" max="10"></div><div style="flex:1"><div style="font-size:9px;color:var(--muted);margin-bottom:4px">回数</div><input type="number" id="pr'+i+'" class="popup-input-num" value="'+ex.plans[i].r+'" min="1" max="999"></div></div></div>';}
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px;background:var(--bg3);border-radius:8px"><input type="checkbox" id="ex-lim" '+(ex.toLimit?'checked':'')+' style="width:18px;height:18px;accent-color:var(--accent)"><label for="ex-lim" style="font-size:13px;color:var(--muted2)">最終セットは限界まで</label></div>';
+  h+='<button onclick="saveEx()" class="action-btn primary" style="margin-bottom:8px">SAVE</button><button class="popup-close" onclick="closePopup()">CANCEL</button></div></div>';
+  wrap.innerHTML=h;
+  var ol=document.getElementById('ex-ol');if(ol)ol.addEventListener('click',function(e){if(e.target===this)closePopup();});
+}
+function saveEx(){
+  var name=document.getElementById('ex-name-inp').value.trim();
+  if(!name){alert('種目名を入力してください');return;}
+  var desc=document.getElementById('ex-desc-inp').value.trim();
+  var labels=['初級','標準','上級'];var plans=[];
+  for(var i=0;i<3;i++){var s=parseInt(document.getElementById('ps'+i).value)||2;var r=parseInt(document.getElementById('pr'+i).value)||10;plans.push({l:labels[i],s:s,r:r});}
+  var toLimit=document.getElementById('ex-lim').checked;
+  var newEx={id:'custom_'+Date.now(),name:name,desc:desc,steps:['フォームを確認しながら行いましょう'],muscles:[],plans:plans,toLimit:toLimit};
+  if(G_editIdx===null||G_editIdx===undefined){EXERCISES[G_editPartId].push(newEx);}else{EXERCISES[G_editPartId][G_editIdx]=newEx;}
+  closePopup();render();
+}
+
+load();render();
+</script>
+</body>
+</html>
